@@ -28,6 +28,7 @@ import java.util.Random;
 @Api(tags = "医院设置管理")
 @RestController
 @RequestMapping("/admin/hosp/hospitalSet")
+@CrossOrigin
 public class HospitalSetController {
     @Autowired
     private HospitalSetService hospitalSetService;
@@ -58,8 +59,8 @@ public class HospitalSetController {
     @PostMapping("findPage/{current}/{limit}")
     public Result findPage(@PathVariable Long current,
                            @PathVariable Long limit,
-                           @RequestBody(required = false) HospitalSetQueryVo hospitalQueryVo) {        //hospitalQueryVo 传入进来的查询条件hospname 和hospcode
-
+                           @RequestBody(required = false) HospitalSetQueryVo hospitalQueryVo) {
+        //hospitalQueryVo 传入进来的查询条件hospname 和hospcode
         //创建page对象 传递currnet 和 limit
         Page<HospitalSet> page = new Page<>(current, limit);
 
@@ -75,7 +76,6 @@ public class HospitalSetController {
         //调用方法
         Page<HospitalSet> hospitalSetPage = hospitalSetService.page(page, wrapper);
         return Result.ok(hospitalSetPage);
-
     }
 
 
