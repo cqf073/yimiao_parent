@@ -7,7 +7,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -27,6 +29,14 @@ public class Dictcontroller {
 
     @Autowired
     private DictService dictService;
+    //    导入数据字典
+    @ApiOperation("导入数据字典")
+    @PostMapping("importDict")
+    public Result importDict(MultipartFile file){
+        dictService.importDict(file);
+        return Result.ok();
+    }
+
 
 //    根据id 查询子数据列表
     @ApiOperation("根据id 查询子数据列表")
@@ -35,4 +45,13 @@ public class Dictcontroller {
       List<Dict> list =   dictService.findChildData(id) ;
         return Result.ok(list);
     }
+
+    //导出数据字典为excel
+    @ApiOperation("导出数据字典为excel")
+    @GetMapping("exportDictExcel")
+    public void exportDictExcel(HttpServletResponse httpServletResponse){
+        dictService.exportDictExcel(httpServletResponse);
+    }
+
+
 }
