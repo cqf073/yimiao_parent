@@ -9,9 +9,12 @@ import com.cqf.yimiao.common.utils.MD5;
 import com.cqf.yimiao.hosp.service.DepartmentService;
 import com.cqf.yimiao.hosp.service.HospitalService;
 import com.cqf.yimiao.hosp.service.HospitalSetService;
+import com.cqf.yimiao.hosp.service.ScheduleService;
 import com.cqf.yimiao.model.hosp.Department;
 import com.cqf.yimiao.model.hosp.Hospital;
+import com.cqf.yimiao.model.hosp.Schedule;
 import com.cqf.yimiao.vo.hosp.DepartmentQueryVo;
+import com.cqf.yimiao.vo.hosp.ScheduleQueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
@@ -40,6 +43,71 @@ public class Apicontroller {
     private HospitalSetService hospitalSetService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private ScheduleService scheduleService;
+
+
+
+
+
+
+
+
+//    删除排班接口
+    @PostMapping("/schedule/remove")
+    public  Result removeSchedule( HttpServletRequest request){
+        Map<String, String[]>  requestParameterMap= request.getParameterMap();
+        Map<String, Object> parameterMap = HttpRequestHelper.switchMap(requestParameterMap);
+        String hoscode = (String) parameterMap.get("hoscode");
+        String hosScheduleId = (String) parameterMap.get("hosScheduleId");
+        boolean checkSign = this.checkSign(parameterMap);
+//        if (!checkSign) {
+//            throw new YimiaoException(ResultCodeEnum.SIGN_ERROR);
+//        }
+        scheduleService.removeSchedule(hoscode,hosScheduleId);
+        return Result.ok();
+
+    }
+
+//    查询排班接口（）
+    @PostMapping("/schedule/list")
+    public Result findSchedule(HttpServletRequest request){
+        Map<String, String[]>  requestParameterMap= request.getParameterMap();
+        Map<String, Object> parameterMap = HttpRequestHelper.switchMap(requestParameterMap);
+        boolean checkSign = this.checkSign(parameterMap);
+//        if (!checkSign) {
+//            throw new YimiaoException(ResultCodeEnum.SIGN_ERROR);
+//        }
+
+        String hosCode = (String) parameterMap.get("hoscode");
+        String depcode = (String) parameterMap.get("depcode");
+//        当前页
+        int page = StringUtils.isEmpty((String) parameterMap.get("page"))?1:
+                Integer.parseInt((String) parameterMap.get("page"));
+        int limit = StringUtils.isEmpty((String) parameterMap.get("limit"))?1:
+                Integer.parseInt((String) parameterMap.get("limit"));
+
+        ScheduleQueryVo scheduleQueryVo = new ScheduleQueryVo();
+        scheduleQueryVo.setHoscode(hosCode);
+        scheduleQueryVo.setDepcode(depcode);
+        Page<Schedule> pageModel = scheduleService.findPageSchedule(page,limit,scheduleQueryVo);
+        return Result.ok(pageModel);
+    }
+
+//   上传排班
+    @PostMapping("saveSchedule")
+    public Result saveSchedule(HttpServletRequest request){
+        Map<String, String[]>  requestParameterMap= request.getParameterMap();
+        Map<String, Object> parameterMap = HttpRequestHelper.switchMap(requestParameterMap);
+        boolean checkSign = this.checkSign(parameterMap);
+        System.out.println("----------check--------------"+checkSign);
+//        if (!checkSign) {
+//            throw new YimiaoException(ResultCodeEnum.SIGN_ERROR);
+//        }
+        scheduleService.saveSchedule(parameterMap);
+        return Result.ok();
+
+    }
 
 //    删除科室接口
     @PostMapping("department/remove")
@@ -85,10 +153,7 @@ public class Apicontroller {
         DepartmentQueryVo departmentQueryVo = new DepartmentQueryVo();
         departmentQueryVo.setHoscode(hosCode);
         Page<Department> pageModel = departmentService.findPageDepartment(page,limit,departmentQueryVo);
-
-
         return Result.ok(pageModel);
-
     }
 
 
@@ -171,5 +236,19 @@ public class Apicontroller {
         hospitalService.save(parameterMap);
         return Result.ok();
 
+    }
+    private  boolean checkSign(Map<String, Object> parameterMap){
+        //前端传来的签名
+        String hosSign = (String) parameterMap.get("sign");
+        String hosCode = (String) parameterMap.get("hoscode");
+        //获取数据库中的sign
+        String signKey = hospitalSetService.getSignKey(hosCode);
+        //前端的sign加密
+        System.out.println("---------------------------------");
+        System.out.println(signKey);
+        System.out.println(hosSign);
+        System.out.println("---------------------------------");
+        String keySignMD5 = MD5.encrypt(signKey);
+        return hosSign.equals(keySignMD5);
     }
 }

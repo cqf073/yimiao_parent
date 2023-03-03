@@ -10,10 +10,11 @@ redis
 
 
  #在 src文件夹下
- 虚拟机 在/www/server/redis
+ 虚拟机 在cd /www/server/redis/src
   开启： ./redis-server ../redis.conf
   关闭：ps -ef |grep redis
         kill -9 (pid）
+  查看是否开启： ps -ef |grep redis
   #  补充：linxu下面redis有问题
 -----------------------------------------------------
 
@@ -24,6 +25,7 @@ docker inspect -f '{{.Name}} => {{.NetworkSettings.IPAddress }}' $(docker ps -aq
 
 docker pull mongo:latest
 #创建和启动容器
+docker start /stop id
 docker run -d --restart=always -p 27017:27017 --name mymongo -v /data/db:/data/db -d mongo
 #进入容器
 docker exec -it mymongo /bin/bash

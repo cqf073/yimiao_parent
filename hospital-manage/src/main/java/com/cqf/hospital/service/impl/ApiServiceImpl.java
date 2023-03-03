@@ -367,6 +367,7 @@ public class ApiServiceImpl implements ApiService {
 
     public static String getImgStr(String imgFile){
         byte[] data = getImageBytes(imgFile);
+
         return new String(Base64.encodeBase64(data));
     }
 

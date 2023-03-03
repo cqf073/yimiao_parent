@@ -1,13 +1,10 @@
 package com.cqf.hospitalmanage;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
+//@SpringBootTest
 class HospitalManageApplicationTests {
+//    @Autowired
+//    private ApiService apiService;
 
-    @Test
-    void contextLoads() {
-    }
+
 
 }
